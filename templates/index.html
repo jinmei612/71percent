@@ -20,8 +20,11 @@
         </header>
 
         <div class="location-section">
-            <div class="location-input">
-                <input type="text" id="locationInput" placeholder="Enter location (e.g., San Diego, CA)" value="San Diego, CA">
+            <div class="location-input-wrapper">
+                <div class="location-input">
+                    <input type="text" id="locationInput" placeholder="Enter location (e.g., San Diego, CA)" value="San Diego, CA" autocomplete="off">
+                    <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
                 <button id="searchBtn">Search</button>
             </div>
         </div>
@@ -34,64 +37,7 @@
         <div id="error" class="error hidden"></div>
 
         <div id="results" class="results hidden">
-            <div class="conditions-card">
-                <h2>Current Ocean Conditions</h2>
-                <div class="conditions-grid">
-                    <div class="condition-item">
-                        <span class="condition-label">Air Temperature</span>
-                        <span class="condition-value" id="temperature">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Water Temperature</span>
-                        <span class="condition-value" id="waterTemperature">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Wave Height</span>
-                        <span class="condition-value" id="waveHeight">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Swell Direction</span>
-                        <span class="condition-value" id="swellDirection">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Wind Speed</span>
-                        <span class="condition-value" id="windSpeed">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Wind Direction</span>
-                        <span class="condition-value" id="windDirection">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Visibility</span>
-                        <span class="condition-value" id="visibility">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Tide Level</span>
-                        <span class="condition-value" id="tideLevel">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Current Strength</span>
-                        <span class="condition-value" id="currentStrength">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">UV Index</span>
-                        <span class="condition-value" id="uvIndex">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Cloud Cover</span>
-                        <span class="condition-value" id="cloudCover">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Precipitation</span>
-                        <span class="condition-value" id="precipitation">--</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="condition-label">Barometric Pressure</span>
-                        <span class="condition-value" id="pressure">--</span>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Recommended Activity at Top -->
             <div class="recommendation-card">
                 <div class="recommendation-header">
                     <h2>Best Activity Today</h2>
@@ -106,10 +52,73 @@
                 </div>
             </div>
 
-            <div class="all-activities">
-                <h2>All Activities</h2>
-                <div class="activities-grid" id="activitiesGrid">
-                    <!-- Activities will be populated here -->
+            <!-- Two Column Layout -->
+            <div class="two-column-layout">
+                <!-- Left Column: Conditions -->
+                <div class="conditions-card">
+                    <h2>Current Ocean Conditions</h2>
+                    <div class="conditions-grid">
+                        <div class="condition-item">
+                            <span class="condition-label">Air Temperature</span>
+                            <span class="condition-value" id="temperature">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Water Temperature</span>
+                            <span class="condition-value" id="waterTemperature">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Wave Height</span>
+                            <span class="condition-value" id="waveHeight">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Swell Direction</span>
+                            <span class="condition-value" id="swellDirection">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Wind Speed</span>
+                            <span class="condition-value" id="windSpeed">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Wind Direction</span>
+                            <span class="condition-value" id="windDirection">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Visibility</span>
+                            <span class="condition-value" id="visibility">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Tide Level</span>
+                            <span class="condition-value" id="tideLevel">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Current Strength</span>
+                            <span class="condition-value" id="currentStrength">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">UV Index</span>
+                            <span class="condition-value" id="uvIndex">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Cloud Cover</span>
+                            <span class="condition-value" id="cloudCover">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Precipitation</span>
+                            <span class="condition-value" id="precipitation">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Barometric Pressure</span>
+                            <span class="condition-value" id="pressure">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: All Activities -->
+                <div class="all-activities">
+                    <h2>All Activities</h2>
+                    <div class="activities-list" id="activitiesGrid">
+                        <!-- Activities will be populated here -->
+                    </div>
                 </div>
             </div>
         </div>

@@ -557,6 +557,67 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/api/autocomplete', methods=['GET'])
+def autocomplete_location():
+    """API endpoint for location autocomplete using Google Maps Places API"""
+    query = request.args.get('query', '')
+    
+    if not query or len(query) < 2:
+        return jsonify({'success': True, 'predictions': []})
+    
+    api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    if not api_key:
+        # Fallback: Use OpenWeatherMap geocoding for basic suggestions
+        try:
+            openweather_key = os.getenv('OPENWEATHER_API_KEY')
+            if openweather_key:
+                url = 'http://api.openweathermap.org/geo/1.0/direct'
+                params = {'q': query, 'limit': 5, 'appid': openweather_key}
+                response = requests.get(url, params=params, timeout=3)
+                if response.status_code == 200:
+                    data = response.json()
+                    predictions = []
+                    for item in data:
+                        name = f"{item.get('name', '')}, {item.get('state', '')}, {item.get('country', '')}"
+                        predictions.append({
+                            'description': name,
+                            'place_id': f"owm_{item.get('lat')}_{item.get('lon')}",
+                            'structured_formatting': {'main_text': item.get('name', ''), 'secondary_text': f"{item.get('state', '')}, {item.get('country', '')}"}
+                        })
+                    return jsonify({'success': True, 'predictions': predictions})
+        except Exception as e:
+            print(f"OpenWeatherMap autocomplete error: {e}")
+        return jsonify({'success': True, 'predictions': []})
+    
+    # Use Google Maps Places API
+    try:
+        url = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
+        params = {
+            'input': query,
+            'key': api_key,
+            'types': '(cities)',
+            'components': 'country:us|country:mx|country:ca'  # Focus on North America coastal areas
+        }
+        response = requests.get(url, params=params, timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('status') == 'OK':
+                return jsonify({
+                    'success': True,
+                    'predictions': data.get('predictions', [])
+                })
+        return jsonify({'success': True, 'predictions': []})
+    except Exception as e:
+        print(f"Google Maps API error: {e}")
+        return jsonify({'success': True, 'predictions': []})
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Docker"""
+    return jsonify({'status': 'healthy', 'service': 'ocean-activity-forecast'}), 200
+
+
 @app.route('/api/conditions', methods=['GET'])
 def get_conditions():
     """API endpoint to get ocean conditions and activity recommendations"""
@@ -582,5 +643,7 @@ def get_conditions():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug, host='0.0.0.0', port=port)
 
