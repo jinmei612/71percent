@@ -59,6 +59,48 @@ The app evaluates ocean conditions and scores each activity based on:
 3. **Open in browser**:
    Navigate to `http://localhost:5000`
 
+### Docker Setup
+
+The easiest way to run the application is using Docker:
+
+1. **Build the Docker image**:
+   ```bash
+   docker build -t ocean-activity-app .
+   ```
+
+2. **Run with Docker**:
+   ```bash
+   docker run -d -p 5000:5000 --env-file .env --name ocean-activity ocean-activity-app
+   ```
+   
+   Or with environment variables inline:
+   ```bash
+   docker run -d -p 5000:5000 \
+     -e OPENWEATHER_API_KEY=your_key \
+     -e STORMGLASS_API_KEY=your_key \
+     -e GOOGLE_MAPS_API_KEY=your_key \
+     --name ocean-activity ocean-activity-app
+   ```
+
+3. **Using Docker Compose** (Recommended):
+   ```bash
+   # Create .env file with your API keys first
+   docker-compose up -d
+   ```
+   
+   To view logs:
+   ```bash
+   docker-compose logs -f
+   ```
+   
+   To stop:
+   ```bash
+   docker-compose down
+   ```
+
+4. **Open in browser**:
+   Navigate to `http://localhost:5000`
+
 ### API Configuration
 
 The app integrates with multiple ocean condition APIs. Configure API keys for real data:
@@ -80,15 +122,27 @@ The app integrates with multiple ocean condition APIs. Configure API keys for re
    - Free tier: 50 requests/day
    - Add to `.env`: `STORMGLASS_API_KEY=your_key_here`
    
+   **Google Maps** (Optional - for location autocomplete):
+   - Sign up at: https://console.cloud.google.com/
+   - Free tier: $200 credit/month
+   - Enable "Places API" in Google Cloud Console
+   - Add to `.env`: `GOOGLE_MAPS_API_KEY=your_key_here`
+   
    **NOAA Tides & Currents** (Optional - for tide data):
    - Free, no API key needed
    - Find station ID at: https://tidesandcurrents.noaa.gov/
    - Add to `.env`: `NOAA_STATION_ID=9410170` (example: San Diego)
 
-3. **Edit `.env` file** with your API keys:
+3. **Copy the example environment file and edit with your API keys**:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Then edit `.env` with your API keys:
    ```env
    OPENWEATHER_API_KEY=your_openweather_api_key_here
    STORMGLASS_API_KEY=your_stormglass_api_key_here
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
    NOAA_STATION_ID=9410170
    ```
 
@@ -97,8 +151,9 @@ The app integrates with multiple ocean condition APIs. Configure API keys for re
 ### API Data Sources
 
 The app fetches data from:
-- **OpenWeatherMap**: Air temperature, wind speed/direction, pressure, cloud cover, precipitation
+- **OpenWeatherMap**: Air temperature, wind speed/direction, pressure, cloud cover, precipitation, UV index
 - **Stormglass**: Wave height, swell direction, water temperature, current strength
+- **Google Maps Places API**: Location autocomplete suggestions (fallback to OpenWeatherMap geocoding if not configured)
 - **NOAA**: Tide levels and predictions
 - **Fallback**: Simulated data if APIs are unavailable or unconfigured
 
@@ -110,6 +165,9 @@ The app displays the data source in the conditions response.
 .
 ├── app.py                 # Flask backend (Python)
 ├── requirements.txt       # Python dependencies
+├── Dockerfile             # Docker configuration
+├── docker-compose.yml     # Docker Compose configuration
+├── .dockerignore          # Files to exclude from Docker build
 ├── templates/
 │   └── index.html         # Main HTML template
 └── static/
@@ -119,9 +177,10 @@ The app displays the data source in the conditions response.
 
 ## Technologies
 
-- **Backend**: Python 3, Flask
+- **Backend**: Python 3, Flask, Gunicorn
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **API**: RESTful API with JSON responses
+- **Containerization**: Docker, Docker Compose
 
 ## Browser Support
 

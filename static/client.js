@@ -1,6 +1,78 @@
 // Client-side JavaScript for Ocean Activity Guide
 // Calls Python Flask backend API
 
+let autocompleteTimeout = null;
+let selectedIndex = -1;
+
+async function fetchAutocomplete(query) {
+    try {
+        const response = await fetch(`/api/autocomplete?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        
+        if (data.success && data.predictions) {
+            return data.predictions;
+        }
+        return [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function showAutocompleteDropdown(predictions) {
+    const dropdown = document.getElementById('autocompleteDropdown');
+    dropdown.innerHTML = '';
+    
+    if (predictions.length === 0) {
+        dropdown.classList.add('hidden');
+        return;
+    }
+    
+    predictions.forEach((prediction, index) => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.dataset.index = index;
+        
+        const mainText = prediction.structured_formatting?.main_text || prediction.description.split(',')[0];
+        const secondaryText = prediction.structured_formatting?.secondary_text || prediction.description.split(',').slice(1).join(',').trim();
+        
+        item.innerHTML = `
+            <div class="autocomplete-item-main">${mainText}</div>
+            ${secondaryText ? `<div class="autocomplete-item-secondary">${secondaryText}</div>` : ''}
+        `;
+        
+        item.addEventListener('click', () => {
+            document.getElementById('locationInput').value = prediction.description;
+            dropdown.classList.add('hidden');
+            selectedIndex = -1;
+            searchLocation();
+        });
+        
+        dropdown.appendChild(item);
+    });
+    
+    dropdown.classList.remove('hidden');
+}
+
+function handleLocationInput() {
+    const input = document.getElementById('locationInput');
+    const query = input.value.trim();
+    
+    if (autocompleteTimeout) {
+        clearTimeout(autocompleteTimeout);
+    }
+    
+    if (query.length < 2) {
+        document.getElementById('autocompleteDropdown').classList.add('hidden');
+        selectedIndex = -1;
+        return;
+    }
+    
+    autocompleteTimeout = setTimeout(async () => {
+        const predictions = await fetchAutocomplete(query);
+        showAutocompleteDropdown(predictions);
+    }, 300);
+}
+
 async function searchLocation() {
     const locationInput = document.getElementById('locationInput');
     const location = locationInput.value.trim();
@@ -110,7 +182,7 @@ function displayResults(conditions, activities) {
         const activityCard = document.createElement('div');
         activityCard.className = 'activity-card';
         
-        const scoreColor = activity.score >= 70 ? '#0277bd' : 
+        const scoreColor = activity.score >= 70 ? '#26a69a' : 
                           activity.score >= 50 ? '#f57c00' : '#d32f2f';
         
         activityCard.innerHTML = `
@@ -150,10 +222,64 @@ function displayResults(conditions, activities) {
 }
 
 // Event listeners
-document.getElementById('searchBtn').addEventListener('click', searchLocation);
-document.getElementById('locationInput').addEventListener('keypress', (e) => {
+document.getElementById('searchBtn').addEventListener('click', () => {
+    document.getElementById('autocompleteDropdown').classList.add('hidden');
+    searchLocation();
+});
+
+const locationInput = document.getElementById('locationInput');
+locationInput.addEventListener('input', handleLocationInput);
+locationInput.addEventListener('focus', () => {
+    const query = locationInput.value.trim();
+    if (query.length >= 2) {
+        handleLocationInput();
+    }
+});
+locationInput.addEventListener('keydown', (e) => {
+    const dropdown = document.getElementById('autocompleteDropdown');
+    const items = dropdown.querySelectorAll('.autocomplete-item');
+    
     if (e.key === 'Enter') {
-        searchLocation();
+        e.preventDefault();
+        if (selectedIndex >= 0 && items[selectedIndex]) {
+            items[selectedIndex].click();
+        } else {
+            dropdown.classList.add('hidden');
+            searchLocation();
+        }
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        updateSelectedItem(items);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, -1);
+        updateSelectedItem(items);
+    } else if (e.key === 'Escape') {
+        dropdown.classList.add('hidden');
+        selectedIndex = -1;
+    }
+});
+
+function updateSelectedItem(items) {
+    items.forEach((item, index) => {
+        if (index === selectedIndex) {
+            item.style.background = '#e0f2f1';
+        } else {
+            item.style.background = '';
+        }
+    });
+    if (selectedIndex >= 0 && items[selectedIndex]) {
+        items[selectedIndex].scrollIntoView({ block: 'nearest' });
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const locationSection = document.querySelector('.location-input-wrapper');
+    if (!locationSection.contains(e.target)) {
+        document.getElementById('autocompleteDropdown').classList.add('hidden');
+        selectedIndex = -1;
     }
 });
 
