@@ -2,6 +2,16 @@
 
 A professional web application that provides real-time ocean activity recommendations based on current weather and marine conditions. Features a beautiful ocean-themed UI with animated wave backgrounds and intelligent condition analysis.
 
+## Motivation
+
+This application was created with two primary goals in mind:
+
+1. **Safety First**: After seeing news coverage of a drowning incident on TV, I wanted to create a tool that helps warn people when it's not safe to go near water. The app automatically detects dangerous ocean conditions (high waves, strong currents, extreme weather) and displays prominent warnings to help prevent accidents.
+
+2. **Activity Decision Support**: I needed help deciding where to go for water activities and which water activity would be best suited for the current conditions. The app evaluates multiple ocean activities (surfing, scuba diving, freediving, and ocean swimming) and provides personalized recommendations based on real-time marine and weather data.
+
+By combining safety warnings with intelligent activity recommendations, this app aims to help people make informed decisions about ocean activities while prioritizing their safety.
+
 ## Features
 
 ### Core Functionality
