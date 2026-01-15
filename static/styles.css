@@ -197,14 +197,13 @@ header h1 {
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
     transition: background 0.2s;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-size: 0.9rem;
 }
 
 #searchBtn:hover {
@@ -269,6 +268,12 @@ header h1 {
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     align-items: start;
+    margin-top: 24px;
+    transition: opacity 0.3s ease;
+}
+
+.two-column-layout.collapsed {
+    display: none;
 }
 
 .conditions-card,
@@ -285,31 +290,73 @@ header h1 {
     margin-bottom: 0;
 }
 
+.more-button {
+    width: 100%;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #00897b;
+    transition: all 0.2s;
+    margin-top: 24px;
+}
+
+.more-button:hover {
+    background: #f5f5f5;
+    border-color: #26a69a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.more-button:active {
+    transform: translateY(1px);
+}
+
+.more-button-text {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.more-button-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.more-button[aria-expanded="true"] .more-button-arrow {
+    transform: rotate(180deg);
+}
+
 .conditions-card h2,
 .recommendation-card h2 {
     margin-bottom: 24px;
     color: #00897b;
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 1px;
     border-bottom: 3px solid #26a69a;
     padding-bottom: 12px;
     text-transform: uppercase;
-    font-size: 1.3rem;
-    letter-spacing: 1px;
 }
 
 .conditions-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 8px;
 }
 
 .condition-item {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 16px;
+    gap: 6px;
+    padding: 11px;
     background: #f5f5f5;
     border-radius: 6px;
     border: 1px solid #e0e0e0;
@@ -321,6 +368,15 @@ header h1 {
     background: #eeeeee;
     border-left-color: #00897b;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.condition-item.condition-highlighted {
+    background: #e0f2f1 !important;
+    border-left-color: #26a69a !important;
+    border-left-width: 6px !important;
+    box-shadow: 0 4px 12px rgba(38, 166, 154, 0.3) !important;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
 }
 
 .condition-label {
@@ -346,6 +402,10 @@ header h1 {
     margin-bottom: 24px;
     flex-wrap: wrap;
     gap: 16px;
+}
+
+.recommendation-header .suitability-indicator {
+    margin-left: 12px;
 }
 
 .score-badge {
@@ -428,14 +488,12 @@ header h1 {
 .all-activities h2 {
     margin-bottom: 24px;
     color: #00897b;
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 1px;
     border-bottom: 3px solid #26a69a;
     padding-bottom: 12px;
     text-transform: uppercase;
-    font-size: 1.3rem;
-    letter-spacing: 1px;
 }
 
 .activities-list {
@@ -455,14 +513,49 @@ header h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.activity-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    gap: 12px;
+}
+
 .activity-score {
     font-size: 0.9rem;
     color: #26a69a;
     font-weight: 700;
-    margin-top: 10px;
     font-variant-numeric: tabular-nums;
     font-family: 'Courier New', monospace;
 }
+
+.suitability-indicator {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.suitability-indicator.suitability-recommended {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #4caf50;
+}
+
+.suitability-indicator.suitability-suitable {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #2196f3;
+}
+
+.suitability-indicator.suitability-do-not-go {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #f44336;
+}
+
 
 .timestamp {
     font-size: 0.75rem;
@@ -471,6 +564,21 @@ header h1 {
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
     font-style: italic;
+}
+
+.data-source-info {
+    font-size: 0.8rem;
+    color: #616161;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border-left: 3px solid #26a69a;
+    font-style: italic;
+}
+
+.data-source-info.hidden {
+    display: none;
 }
 
 @media (max-width: 768px) {
@@ -519,5 +627,175 @@ header h1 {
     .recommendation-card,
     .all-activities {
         padding: 20px;
+    }
+}
+
+/* Severe Conditions Warning Popup */
+.severe-warning-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+}
+
+.severe-warning-popup.hidden {
+    display: none;
+}
+
+.severe-warning-content {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 3px solid #d32f2f;
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.severe-warning-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #ffebee;
+}
+
+.severe-warning-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.severe-warning-header h2 {
+    margin: 0;
+    color: #d32f2f;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.severe-warning-body {
+    margin-bottom: 24px;
+}
+
+.severe-warning-message {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #212121;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #ffebee;
+    border-radius: 8px;
+    border-left: 4px solid #d32f2f;
+}
+
+.severe-warning-message strong {
+    color: #d32f2f;
+    font-weight: 700;
+}
+
+.severe-warning-reasons {
+    margin-top: 16px;
+}
+
+.severe-warning-reasons p {
+    font-weight: 600;
+    color: #424242;
+    margin-bottom: 12px;
+}
+
+.severe-warning-reasons ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.severe-warning-reasons li {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: #fff3e0;
+    border-radius: 6px;
+    border-left: 4px solid #ff9800;
+    color: #424242;
+    line-height: 1.5;
+}
+
+.severe-warning-reasons li:before {
+    content: "⚠ ";
+    color: #f57c00;
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+.severe-warning-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 16px;
+    border-top: 2px solid #ffebee;
+}
+
+.severe-warning-close-btn {
+    padding: 14px 32px;
+    background: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.severe-warning-close-btn:hover {
+    background: #b71c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+}
+
+.severe-warning-close-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .severe-warning-content {
+        padding: 24px;
+        width: 95%;
+    }
+
+    .severe-warning-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .severe-warning-icon {
+        font-size: 2rem;
+    }
+
+    .severe-warning-message {
+        font-size: 1rem;
     }
 }

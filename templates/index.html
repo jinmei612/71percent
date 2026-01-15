@@ -15,7 +15,7 @@
     <div class="container">
         <header>
             <h1>Ocean Activity Forecast</h1>
-            <p class="subtitle">Marine conditions for surfing, scuba diving, freediving, and fishing</p>
+            <p class="subtitle">Marine conditions for surfing, scuba diving, freediving, and ocean swimming</p>
             <p class="data-source">Data updated in real-time • Marine weather conditions</p>
         </header>
 
@@ -36,6 +36,23 @@
 
         <div id="error" class="error hidden"></div>
 
+        <!-- Severe Conditions Warning Popup -->
+        <div id="severeWarningPopup" class="severe-warning-popup hidden">
+            <div class="severe-warning-content">
+                <div class="severe-warning-header">
+                    <span class="severe-warning-icon">⚠️</span>
+                    <h2>Severe Ocean Conditions Warning</h2>
+                </div>
+                <div class="severe-warning-body">
+                    <p class="severe-warning-message">Current ocean conditions are <strong>dangerous</strong>. We strongly advise <strong>DO NOT GO</strong> to the ocean at this time.</p>
+                    <div id="severeWarningReasons" class="severe-warning-reasons"></div>
+                </div>
+                <div class="severe-warning-footer">
+                    <button id="severeWarningClose" class="severe-warning-close-btn">I Understand</button>
+                </div>
+            </div>
+        </div>
+
         <div id="results" class="results hidden">
             <!-- Recommended Activity at Top -->
             <div class="recommendation-card">
@@ -52,27 +69,30 @@
                 </div>
             </div>
 
-            <!-- Two Column Layout -->
-            <div class="two-column-layout">
-                <!-- Left Column: Conditions -->
+            <!-- More Button -->
+            <button id="moreButton" class="more-button" aria-expanded="false">
+                <span class="more-button-text">More</span>
+                <span class="more-button-arrow">▼</span>
+            </button>
+
+            <!-- Two Column Layout (Collapsible) -->
+            <div id="moreContent" class="two-column-layout collapsed">
+                <!-- Left Column: All Activities -->
+                <div class="all-activities">
+                    <h2>All Activities</h2>
+                    <div class="activities-list" id="activitiesGrid">
+                        <!-- Activities will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Conditions -->
                 <div class="conditions-card">
                     <h2>Current Ocean Conditions</h2>
+                    <div class="data-source-info hidden" id="dataSourceInfo"></div>
                     <div class="conditions-grid">
-                        <div class="condition-item">
-                            <span class="condition-label">Air Temperature</span>
-                            <span class="condition-value" id="temperature">--</span>
-                        </div>
-                        <div class="condition-item">
-                            <span class="condition-label">Water Temperature</span>
-                            <span class="condition-value" id="waterTemperature">--</span>
-                        </div>
                         <div class="condition-item">
                             <span class="condition-label">Wave Height</span>
                             <span class="condition-value" id="waveHeight">--</span>
-                        </div>
-                        <div class="condition-item">
-                            <span class="condition-label">Swell Direction</span>
-                            <span class="condition-value" id="swellDirection">--</span>
                         </div>
                         <div class="condition-item">
                             <span class="condition-label">Wind Speed</span>
@@ -81,6 +101,18 @@
                         <div class="condition-item">
                             <span class="condition-label">Wind Direction</span>
                             <span class="condition-value" id="windDirection">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Swell Direction</span>
+                            <span class="condition-value" id="swellDirection">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Water Temperature</span>
+                            <span class="condition-value" id="waterTemperature">--</span>
+                        </div>
+                        <div class="condition-item">
+                            <span class="condition-label">Air Temperature</span>
+                            <span class="condition-value" id="temperature">--</span>
                         </div>
                         <div class="condition-item">
                             <span class="condition-label">Visibility</span>
@@ -110,14 +142,6 @@
                             <span class="condition-label">Barometric Pressure</span>
                             <span class="condition-value" id="pressure">--</span>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: All Activities -->
-                <div class="all-activities">
-                    <h2>All Activities</h2>
-                    <div class="activities-list" id="activitiesGrid">
-                        <!-- Activities will be populated here -->
                     </div>
                 </div>
             </div>

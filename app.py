@@ -37,11 +37,11 @@ ACTIVITIES = {
         'description': 'Ideal conditions for breath-hold diving with excellent visibility and calm waters.',
         'evaluate': lambda conditions: evaluate_freediving(conditions)
     },
-    'fishing': {
-        'name': 'Fishing',
-        'icon': '🎣',
-        'description': 'Calm conditions perfect for a relaxing day of fishing.',
-        'evaluate': lambda conditions: evaluate_fishing(conditions)
+    'swimming': {
+        'name': 'Ocean Swimming',
+        'icon': '🏊',
+        'description': 'Safe and enjoyable conditions for open water swimming.',
+        'evaluate': lambda conditions: evaluate_swimming(conditions)
     }
 }
 
@@ -171,37 +171,51 @@ def evaluate_freediving(conditions):
     return min(100, max(0, score))
 
 
-def evaluate_fishing(conditions):
-    """Evaluate conditions for fishing"""
+def evaluate_swimming(conditions):
+    """Evaluate conditions for ocean swimming"""
     score = 50
-    # Calm conditions
-    if conditions['waveHeight'] <= 2.5:
-        score += 20
-    elif conditions['waveHeight'] <= 3.5:
-        score += 10
-    # Low to moderate wind
-    if conditions['windSpeed'] <= 15:
+    # Calm conditions are essential for safety
+    if conditions['waveHeight'] <= 1.5:
+        score += 25
+    elif conditions['waveHeight'] <= 2:
         score += 15
-    # Low current makes fishing easier
-    if conditions['currentValue'] <= 2:
-        score += 10
-    # Temperature
-    if conditions['temperature'] >= 60:
+    elif conditions['waveHeight'] <= 2.5:
         score += 8
-    # Barometric pressure affects fish behavior
-    # Stable or rising pressure is often better
-    if conditions['pressureValue'] >= 30.0:
+    # Low wind is important for comfortable swimming
+    if conditions['windSpeed'] <= 8:
+        score += 15
+    elif conditions['windSpeed'] <= 12:
         score += 10
-    elif conditions['pressureValue'] >= 29.8:
+    elif conditions['windSpeed'] <= 15:
         score += 5
-    # Rain can actually help fishing sometimes
+    # Very low current is critical for safety
+    if conditions['currentValue'] <= 1:
+        score += 20
+    elif conditions['currentValue'] <= 1.5:
+        score += 12
+    elif conditions['currentValue'] <= 2:
+        score += 5
+    # Good visibility for safety
+    if conditions['visibility'] >= 40:
+        score += 10
+    elif conditions['visibility'] >= 30:
+        score += 5
+    # Comfortable water temperature
+    if 70 <= conditions['waterTemperature'] <= 78:
+        score += 10
+    elif 68 <= conditions['waterTemperature'] <= 80:
+        score += 5
+    # Rain reduces safety and comfort
     if conditions['hasPrecipitation']:
-        score -= 5
-    # Tide affects fish activity
-    if abs(conditions['tideValue']) <= 1.5:
+        score -= 15
+    # Clear skies are better
+    if conditions['cloudValue'] <= 30:
         score += 5
-    # Cloud cover can be good for fishing
-    if 30 <= conditions['cloudValue'] <= 70:
+    # UV protection needed
+    if conditions['uvIndex'] >= 8:
+        score -= 3
+    # Stable pressure conditions
+    if conditions['pressureValue'] >= 30.0:
         score += 5
     return min(100, max(0, score))
 
@@ -308,48 +322,49 @@ def get_simulated_conditions(location):
     """Fallback: Simulate ocean conditions when APIs are unavailable"""
     base_temp = 65 + random.random() * 15
     water_temp = base_temp - 5 + random.random() * 10
-    wave_height = round((1 + random.random() * 5) * 10) / 10
-    wind_speed = round(5 + random.random() * 20)
-    visibility = round(20 + random.random() * 60)
+    wave_height = 1 + random.random() * 5
+    wind_speed = 5 + random.random() * 20
+    visibility = 20 + random.random() * 60
     
     directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
     wind_direction = random.choice(directions)
     swell_direction = random.choice(directions)
     
-    tide_level = round(random.random() * 4 - 2, 1)
-    if tide_level > 0.5:
+    tide_level = random.random() * 4 - 2
+    tide_val = round(tide_level, 2)
+    if tide_val > 0.5:
         tide_status = 'High'
-    elif tide_level < -0.5:
+    elif tide_val < -0.5:
         tide_status = 'Low'
     else:
         tide_status = 'Medium'
     
-    current_strength = round(0.5 + random.random() * 3, 1)
+    current_strength = 0.5 + random.random() * 3
     uv_index = round(random.random() * 11)
     cloud_cover = round(random.random() * 100)
-    precipitation = round(random.random() * 0.5, 2)
+    precipitation = random.random() * 0.5
     has_rain = precipitation > 0.1
-    pressure = round(29.5 + random.random(), 2)
+    pressure = 29.5 + random.random()
     
     return {
-        'temperature': round(base_temp),
-        'waterTemperature': round(water_temp),
-        'waveHeight': wave_height,
+        'temperature': round(base_temp, 2),
+        'waterTemperature': round(water_temp, 2),
+        'waveHeight': round(wave_height, 2),
         'swellDirection': swell_direction,
-        'windSpeed': wind_speed,
+        'windSpeed': round(wind_speed, 2),
         'windDirection': wind_direction,
-        'visibility': visibility,
-        'tideLevel': f"{tide_status} ({'+' if tide_level > 0 else ''}{tide_level}ft)",
-        'tideValue': tide_level,
-        'currentStrength': f"{current_strength} knots",
-        'currentValue': current_strength,
+        'visibility': round(visibility, 2),
+        'tideLevel': f"{tide_status} ({'+' if tide_val > 0 else ''}{tide_val:.2f}ft)",
+        'tideValue': tide_val,
+        'currentStrength': f"{round(current_strength, 2):.2f} knots",
+        'currentValue': round(current_strength, 2),
         'uvIndex': uv_index,
         'cloudCover': f"{cloud_cover}%",
         'cloudValue': cloud_cover,
-        'precipitation': f'{precipitation}"' if has_rain else 'None',
+        'precipitation': f'{round(precipitation, 2):.2f}"' if has_rain else 'None',
         'hasPrecipitation': has_rain,
-        'pressure': f"{pressure} inHg",
-        'pressureValue': pressure,
+        'pressure': f"{round(pressure, 2):.2f} inHg",
+        'pressureValue': round(pressure, 2),
         'location': location,
         'dataSource': 'Simulated'
     }
@@ -377,13 +392,13 @@ def get_ocean_conditions(location):
             clouds = weather_data.get('clouds', {})
             rain = weather_data.get('rain', {})
             
-            conditions['temperature'] = round(main.get('temp', 70))
-            conditions['pressure'] = round(main.get('pressure', 1013) * 0.02953, 2)
-            conditions['pressureValue'] = conditions['pressure']
-            conditions['pressure'] = f"{conditions['pressure']} inHg"
+            conditions['temperature'] = round(main.get('temp', 70), 2)
+            pressure_val = round(main.get('pressure', 1013) * 0.02953, 2)
+            conditions['pressureValue'] = pressure_val
+            conditions['pressure'] = f"{pressure_val:.2f} inHg"
             
             wind_speed_mps = wind.get('speed', 0)
-            conditions['windSpeed'] = round(wind_speed_mps * 2.237, 1)
+            conditions['windSpeed'] = round(wind_speed_mps * 2.237, 2)
             wind_deg = wind.get('deg', 0)
             directions_map = {
                 (0, 22.5): 'N', (22.5, 67.5): 'NE', (67.5, 112.5): 'E',
@@ -404,7 +419,7 @@ def get_ocean_conditions(location):
             rain_3h = rain.get('3h', 0) if rain else 0
             precipitation = max(rain_1h, rain_3h) * 0.03937
             conditions['hasPrecipitation'] = precipitation > 0.1
-            conditions['precipitation'] = f'{round(precipitation, 2)}"' if conditions['hasPrecipitation'] else 'None'
+            conditions['precipitation'] = f'{round(precipitation, 2):.2f}"' if conditions['hasPrecipitation'] else 'None'
             
             hour = datetime.now().hour
             if 10 <= hour <= 14:
@@ -428,7 +443,7 @@ def get_ocean_conditions(location):
                 
                 if 'waveHeight' in current_hour:
                     wave_height_m = current_hour['waveHeight'].get('noaa', 0)
-                    conditions['waveHeight'] = round(wave_height_m * 3.281, 1)
+                    conditions['waveHeight'] = round(wave_height_m * 3.281, 2)
                 
                 if 'waveDirection' in current_hour:
                     wave_dir = current_hour['waveDirection'].get('noaa', 0)
@@ -444,20 +459,21 @@ def get_ocean_conditions(location):
                 
                 if 'waterTemperature' in current_hour:
                     water_temp_c = current_hour['waterTemperature'].get('noaa', 0)
-                    conditions['waterTemperature'] = round(water_temp_c * 9/5 + 32)
+                    conditions['waterTemperature'] = round(water_temp_c * 9/5 + 32, 2)
                 
                 if 'currentSpeed' in current_hour:
                     current_speed_ms = current_hour['currentSpeed'].get('noaa', 0)
-                    conditions['currentValue'] = round(current_speed_ms * 1.944, 1)
-                    conditions['currentStrength'] = f"{conditions['currentValue']} knots"
+                    current_val = round(current_speed_ms * 1.944, 2)
+                    conditions['currentValue'] = current_val
+                    conditions['currentStrength'] = f"{current_val:.2f} knots"
                 
                 if 'waveHeight' in conditions:
                     wave_ht = conditions.get('waveHeight', 2)
                     wind_spd = conditions.get('windSpeed', 10)
                     if wave_ht < 2 and wind_spd < 10:
-                        conditions['visibility'] = round(40 + random.random() * 40)
+                        conditions['visibility'] = round(40 + random.random() * 40, 2)
                     else:
-                        conditions['visibility'] = round(20 + random.random() * 30)
+                        conditions['visibility'] = round(20 + random.random() * 30, 2)
                 
                 if 'dataSource' not in conditions:
                     conditions['dataSource'] = 'Stormglass'
@@ -469,48 +485,49 @@ def get_ocean_conditions(location):
     # Step 3: Get tide data from NOAA
     tide_level = get_tide_data_noaa(location)
     if tide_level is not None:
-        conditions['tideValue'] = round(tide_level, 1)
-        if tide_level > 0.5:
+        tide_val = round(tide_level, 2)
+        conditions['tideValue'] = tide_val
+        if tide_val > 0.5:
             tide_status = 'High'
-        elif tide_level < -0.5:
+        elif tide_val < -0.5:
             tide_status = 'Low'
         else:
             tide_status = 'Medium'
-        conditions['tideLevel'] = f"{tide_status} ({'+' if tide_level > 0 else ''}{tide_level}ft)"
+        conditions['tideLevel'] = f"{tide_status} ({'+' if tide_val > 0 else ''}{tide_val:.2f}ft)"
         if 'dataSource' in conditions:
             conditions['dataSource'] += ' + NOAA'
         else:
             conditions['dataSource'] = 'NOAA'
     
-    # Fill in missing data with defaults
+    # Fill in missing data with defaults (formatted to 2 decimal places)
     if 'temperature' not in conditions:
-        conditions['temperature'] = 70
+        conditions['temperature'] = 70.00
     if 'waterTemperature' not in conditions:
-        conditions['waterTemperature'] = max(conditions['temperature'] - 7 + random.random() * 5, 60)
+        conditions['waterTemperature'] = round(max(conditions.get('temperature', 70) - 7 + random.random() * 5, 60), 2)
     if 'waveHeight' not in conditions:
-        conditions['waveHeight'] = round(1 + random.random() * 4, 1)
+        conditions['waveHeight'] = round(1 + random.random() * 4, 2)
     if 'swellDirection' not in conditions:
         conditions['swellDirection'] = random.choice(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
     if 'windSpeed' not in conditions:
-        conditions['windSpeed'] = round(5 + random.random() * 15)
+        conditions['windSpeed'] = round(5 + random.random() * 15, 2)
     if 'windDirection' not in conditions:
         conditions['windDirection'] = random.choice(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
     if 'visibility' not in conditions:
-        conditions['visibility'] = round(25 + random.random() * 45)
+        conditions['visibility'] = round(25 + random.random() * 45, 2)
     if 'tideLevel' not in conditions:
-        tide_level = round(random.random() * 4 - 2, 1)
+        tide_level = round(random.random() * 4 - 2, 2)
         if tide_level > 0.5:
             tide_status = 'High'
         elif tide_level < -0.5:
             tide_status = 'Low'
         else:
             tide_status = 'Medium'
-        conditions['tideLevel'] = f"{tide_status} ({'+' if tide_level > 0 else ''}{tide_level}ft)"
-        conditions['tideValue'] = tide_level
+        conditions['tideLevel'] = f"{tide_status} ({'+' if tide_level > 0 else ''}{tide_level:.2f}ft)"
+        conditions['tideValue'] = round(tide_level, 2)
     if 'currentStrength' not in conditions:
-        current_strength = round(0.5 + random.random() * 2.5, 1)
+        current_strength = round(0.5 + random.random() * 2.5, 2)
         conditions['currentValue'] = current_strength
-        conditions['currentStrength'] = f"{current_strength} knots"
+        conditions['currentStrength'] = f"{current_strength:.2f} knots"
     if 'uvIndex' not in conditions:
         conditions['uvIndex'] = round(random.random() * 11)
     if 'cloudCover' not in conditions:
@@ -520,8 +537,9 @@ def get_ocean_conditions(location):
         conditions['hasPrecipitation'] = False
         conditions['precipitation'] = 'None'
     if 'pressure' not in conditions:
-        conditions['pressureValue'] = round(29.5 + random.random(), 2)
-        conditions['pressure'] = f"{conditions['pressureValue']} inHg"
+        pressure_val = round(29.5 + random.random(), 2)
+        conditions['pressureValue'] = pressure_val
+        conditions['pressure'] = f"{pressure_val} inHg"
     
     conditions['location'] = location
     
@@ -547,7 +565,6 @@ def evaluate_activities(conditions):
     
     # Sort by score descending
     scored_activities.sort(key=lambda x: x['score'], reverse=True)
-    
     return scored_activities
 
 

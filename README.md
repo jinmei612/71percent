@@ -1,32 +1,142 @@
-# 🌊 Ocean Activity Guide
+# 🌊 Ocean Activity Forecast
 
-A beautiful web application that helps you find the best ocean activity for the day based on current weather and ocean conditions.
+A professional web application that provides real-time ocean activity recommendations based on current weather and marine conditions. Features a beautiful ocean-themed UI with animated wave backgrounds and intelligent condition analysis.
 
 ## Features
 
-- **Real-time Recommendations**: Get personalized recommendations for the best ocean activity based on current conditions
+### Core Functionality
+
+- **Real-time Activity Recommendations**: Get personalized recommendations for the best ocean activity based on current conditions
+- **Activity Scoring System**: Each activity is scored (0-100) with suitability indicators:
+  - **Recommended** (≥70): Excellent conditions
+  - **Suitable** (50-69): Good conditions
+  - **Do not go** (<50): Poor conditions
+
 - **Multiple Activities**: Evaluates 4 different ocean activities:
-  - 🏄 Surfing
-  - 🤿 Scuba Diving
-  - 🧜 Freediving
-  - 🎣 Fishing
+  - 🏄 **Surfing**: Wave height, wind conditions, swell direction, tide levels
+  - 🤿 **Scuba Diving**: Visibility, calm conditions, current strength, water temperature
+  - 🧜 **Freediving**: Excellent visibility, very calm conditions, minimal current
+  - 🏊 **Ocean Swimming**: Safety-focused conditions, visibility, current strength
 
-- **Condition Analysis**: Displays current ocean conditions including:
-  - Water temperature
-  - Wave height
-  - Wind speed
-  - Visibility
+### Interactive Features
 
-- **Activity Scoring**: Each activity is scored (0-100) based on how ideal the conditions are
-- **Beautiful UI**: Modern, responsive design with gradient backgrounds and smooth animations
+- **Location Autocomplete**: Debounced search (300ms) with keyboard navigation
+  - Google Maps Places API integration
+  - Fallback to OpenWeatherMap geocoding
+  - Keyboard navigation (Arrow keys, Enter, Escape)
+
+- **Condition Highlighting**: Hover over any activity to highlight relevant ocean condition factors
+  - Visual connection between activities and their key conditions
+  - Smooth animations and color-coded highlights
+
+- **Severe Conditions Warning**: Automatic popup alert when dangerous conditions are detected:
+  - Very high waves (>10 ft)
+  - Very strong currents (>4 knots)
+  - Heavy precipitation
+  - Extreme wind speeds (>30 mph)
+  - Extreme UV index (≥11)
+  - Very low visibility (<10 ft)
+
+- **Collapsible Details**: "More" button to expand/collapse detailed conditions and all activities
+- **Data Source Transparency**: Shows which APIs provided the data
+- **Conditional Display**: Only shows condition factors that have available data
+
+### Ocean Conditions Display
+
+The app displays relevant ocean condition factors:
+- Wave Height
+- Wind Speed & Direction
+- Swell Direction
+- Water Temperature
+- Air Temperature (when available)
+- Visibility
+- Tide Level
+- Current Strength
+- UV Index
+- Cloud Cover
+- Precipitation
+- Barometric Pressure (when available)
 
 ## How It Works
 
-The app evaluates ocean conditions and scores each activity based on:
-- **Surfing**: Ideal wave height (3-6 ft), moderate wind (10-20 mph), offshore winds preferred
-- **Scuba Diving**: High visibility (50+ ft), calm conditions, low current, comfortable water temperature
-- **Freediving**: Excellent visibility (60+ ft), very calm conditions, minimal current, warm water (no wetsuit)
-- **Fishing**: Calm conditions, stable barometric pressure, moderate wind, favorable tide conditions
+### Activity Evaluation
+
+The app evaluates ocean conditions and scores each activity based on specific criteria:
+
+- **Surfing**: 
+  - Ideal wave height (3-6 ft)
+  - Moderate wind (10-20 mph)
+  - Offshore winds preferred
+  - Swell direction
+  - Mid-tide conditions
+  - Comfortable air temperature
+
+- **Scuba Diving**: 
+  - High visibility (50+ ft)
+  - Calm conditions (wave height ≤2 ft)
+  - Low wind speeds
+  - Low current strength
+  - Comfortable water temperature
+  - Clear skies for better underwater light
+
+- **Freediving**: 
+  - Excellent visibility (60+ ft)
+  - Very calm conditions (wave height ≤1 ft)
+  - Minimal wind
+  - Very low current
+  - Warm water (usually no wetsuit)
+  - Sunny conditions
+
+- **Ocean Swimming**: 
+  - Calm conditions essential for safety
+  - Low wind speeds
+  - Very low current
+  - Good visibility
+  - Comfortable water temperature
+  - Clear skies
+
+## Technical Architecture
+
+### Backend (Python/Flask)
+
+- **Framework**: Flask 3.0.0 (REST API)
+- **Server**: Gunicorn (WSGI)
+- **Architecture**: Microservices-style with clear separation of concerns
+- **API Integration**: Multi-source data aggregation:
+  - **OpenWeatherMap API**: Weather (temperature, wind, pressure, clouds, precipitation, UV)
+  - **Stormglass API**: Marine (wave height/direction, water temperature, current speed)
+  - **NOAA Tides & Currents API**: Tide predictions
+  - **Google Maps Places API**: Location autocomplete (with OpenWeatherMap geocoding fallback)
+- **Error Handling**: Graceful degradation with fallback to simulated data when APIs fail
+- **Data Processing**: Custom scoring algorithms for 4 activities with dedicated evaluation functions
+- **Environment Management**: python-dotenv for API key configuration
+- **Containerization**: Docker with multi-stage optimization, Docker Compose for orchestration
+
+### Frontend (Vanilla JavaScript)
+
+- **No Frameworks**: Pure JavaScript (ES6+)
+- **Architecture**: Client-side rendering with async API calls
+- **Features**:
+  - Debounced autocomplete (300ms delay)
+  - Keyboard navigation for autocomplete
+  - Dynamic DOM manipulation
+  - Error handling and loading states
+  - Data formatting (all numeric values to 2 decimal places)
+  - Interactive hover highlighting
+  - Severe conditions detection and warnings
+
+### UI/Design
+
+- **Theme**: Light green-blue ocean color palette
+- **Style**: Professional forecast site with hand-crafted aesthetics
+- **Visual Elements**:
+  - Animated wave background (3 layered waves with CSS animations)
+  - Glassmorphism effects (frosted glass on header/loading)
+  - Card-based layout with shadows and borders
+  - Color-coded status badges (Green: Recommended, Blue: Suitable, Red: Do not go)
+- **Typography**: System font stack for optimal performance
+- **Responsive Design**: Mobile-first approach with breakpoint at 768px
+- **Accessibility**: Semantic HTML, keyboard navigation, ARIA attributes
 
 ## Usage
 
@@ -35,14 +145,18 @@ The app evaluates ocean conditions and scores each activity based on:
 3. Open your browser to `http://localhost:5000`
 4. Enter a location (default: San Diego, CA)
 5. Click "Search" or press Enter
-6. View the recommended best activity and see scores for all activities
+6. View the recommended best activity with suitability indicator
+7. Hover over activities to see relevant conditions highlighted
+8. Click "More" to expand detailed conditions and all activities
+9. Review severe condition warnings if present
 
 ## Setup
 
 ### Prerequisites
 
-- Python 3.7 or higher
+- Python 3.11 or higher
 - pip (Python package manager)
+- Docker (optional, for containerized deployment)
 
 ### Installation
 
@@ -63,7 +177,7 @@ The app evaluates ocean conditions and scores each activity based on:
 
 The easiest way to run the application is using Docker:
 
-1. **Build the Docker image**:
+1. **Build the Docker image** (multi-stage build for optimization):
    ```bash
    docker build -t ocean-activity-app .
    ```
@@ -117,7 +231,7 @@ The app integrates with multiple ocean condition APIs. Configure API keys for re
    - Free tier: 60 calls/minute, 1,000,000 calls/month
    - Add to `.env`: `OPENWEATHER_API_KEY=your_key_here`
    
-   **Stormglass** (Optional - for wave height, water temp, currents):
+   **Stormglass** (Optional - for marine data: wave height, water temp, currents):
    - Sign up at: https://stormglass.io/
    - Free tier: 50 requests/day
    - Add to `.env`: `STORMGLASS_API_KEY=your_key_here`
@@ -133,17 +247,14 @@ The app integrates with multiple ocean condition APIs. Configure API keys for re
    - Find station ID at: https://tidesandcurrents.noaa.gov/
    - Add to `.env`: `NOAA_STATION_ID=9410170` (example: San Diego)
 
-3. **Copy the example environment file and edit with your API keys**:
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Then edit `.env` with your API keys:
+3. **Edit `.env` with your API keys**:
    ```env
    OPENWEATHER_API_KEY=your_openweather_api_key_here
    STORMGLASS_API_KEY=your_stormglass_api_key_here
    GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
    NOAA_STATION_ID=9410170
+   PORT=5000
+   FLASK_DEBUG=false
    ```
 
 4. **Run the app** - it will automatically use real APIs when keys are configured, or fall back to simulated data.
@@ -157,7 +268,7 @@ The app fetches data from:
 - **NOAA**: Tide levels and predictions
 - **Fallback**: Simulated data if APIs are unavailable or unconfigured
 
-The app displays the data source in the conditions response.
+The app displays the data source in the conditions response for transparency.
 
 ## Project Structure
 
@@ -165,28 +276,36 @@ The app displays the data source in the conditions response.
 .
 ├── app.py                 # Flask backend (Python)
 ├── requirements.txt       # Python dependencies
-├── Dockerfile             # Docker configuration
+├── Dockerfile             # Multi-stage Docker configuration
 ├── docker-compose.yml     # Docker Compose configuration
 ├── .dockerignore          # Files to exclude from Docker build
+├── .env.example           # Example environment variables
 ├── templates/
 │   └── index.html         # Main HTML template
 └── static/
-    ├── styles.css         # CSS styling
+    ├── styles.css         # CSS styling with animations
     └── client.js          # Client-side JavaScript
 ```
 
 ## Technologies
 
-- **Backend**: Python 3, Flask, Gunicorn
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Backend**: Python 3.11, Flask 3.0.0, Gunicorn
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
 - **API**: RESTful API with JSON responses
-- **Containerization**: Docker, Docker Compose
+- **Containerization**: Docker (multi-stage build), Docker Compose
+- **Environment**: python-dotenv for configuration
 
 ## Browser Support
 
 Works in all modern browsers (Chrome, Firefox, Safari, Edge).
 
+## Safety Features
+
+- **Severe Conditions Detection**: Automatic warnings for dangerous ocean conditions
+- **Conditional Data Display**: Only shows available data, hides missing information
+- **Clear Suitability Indicators**: Color-coded recommendations for user safety
+- **Real-time Updates**: Current conditions with timestamp display
+
 ## License
 
 Free to use and modify.
-
